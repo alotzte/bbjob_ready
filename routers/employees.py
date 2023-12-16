@@ -1,6 +1,7 @@
 import sys
 import csv
 sys.path.append("..")
+import csv
 
 from fastapi import Depends, APIRouter, Request, UploadFile, File
 import models
@@ -48,9 +49,7 @@ async def read_all_by_user(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("home.html", {"request": request, "employees": employees, "user": user})
 
 
-import csv
-
-@router.post("/add-csv")  # Изменим метод на POST
+@router.post("/add-csv")
 async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadFile = File(...)):
     user_data = await get_current_user(request)
     if user_data is None:
@@ -59,7 +58,7 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
     contents = await file.read()
     reader = csv.reader(contents.decode().splitlines())
 
-    next(reader, None)  # Пропускаем заголовок CSV, если он есть
+    next(reader, None)
 
     for row in reader:
         new_employee = models.Employee(
