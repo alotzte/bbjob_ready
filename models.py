@@ -1,46 +1,42 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from database import Base
 
+Base = declarative_base()
 
-class Users(Base):
-    __tablename__ = "users"
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    username = Column(String(100))
+    password = Column(String(100))
+    surname = Column(String(100))
+    name = Column(String(100))
+    middlename = Column(String(100))
+    email = Column(String(100))
+    department_id = Column(Integer, ForeignKey('departments.id'))
+    telegram_id = Column(Integer)
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    username = Column(String, unique=True, index=True)
-    first_name = Column(String)
-    last_name = Column(String)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-    phone_number = Column(String)
-    address_id = Column(Integer, ForeignKey("address.id"), nullable=True)
+class Department(Base):
+    __tablename__ = 'departments'
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255))
+    users = relationship('User')
+    employees = relationship('Employee')
 
-    todos = relationship("Todos", back_populates="owner")
-    address = relationship("Address", back_populates="users_address")
+class Employee(Base):
+    __tablename__ = 'employees'
+    id = Column(Integer, primary_key=True)
+    department_id = Column(Integer, ForeignKey('departments.id'))
+    surname = Column(String(100))
+    name = Column(String(100))
+    middlename = Column(String(100))
+    email = Column(String(100))
 
-
-class Todos(Base):
-    __tablename__ = "todos"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    description = Column(String)
-    priority = Column(Integer)
-    complete = Column(Boolean, default=False)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("Users", back_populates="todos")
-
-class Address(Base):
-    __tablename__ = "address"
-
-    id = Column(Integer, primary_key=True, index=True)
-    address1 = Column(String)
-    address2 = Column(String)
-    city = Column(String)
-    state = Column(String)
-    country = Column(String)
-    postal_code = Column(String)
-    apt_num = Column(Integer)
-    users_address = relationship("Users", back_populates="address")
+class Feature(Base):
+    __tablename__ = 'features'
+    id = Column(Integer, primary_key=True)
+    employer_id = Column(Integer, ForeignKey('employees.id'))
+    salary = Column(Float)
+    email_statistic = Column(Integer)
+    education = Column(Integer)
+    work_years = Column(Integer)

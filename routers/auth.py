@@ -63,14 +63,14 @@ def verify_password(plain_password, hashed_password):
 
 
 def authenticate_user(username: str, password: str, db):
-    user = db.query(models.Users)\
-        .filter(models.Users.username == username)\
+    user = db.query(models.User)\
+        .filter(models.User.username == username)\
         .first()
 
     if not user:
         print("User not found")
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -146,28 +146,19 @@ async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 @router.post("/register", response_class=HTMLResponse)
-async def register_user(request: Request, email: str = Form(...), username: str = Form(...),
-                        firstname: str = Form(...), lastname: str = Form(...),
-                        password: str = Form(...), password2: str = Form(...),
+async def register_user(request: Request, username: str = Form(...), password: str = Form(...),
+                        surname: str = Form(...), name: str = Form(...), middlename: str = Form(...),
+                        email: str = Form(...), department_id: int = Form(...), telegram_id: int = Form(...),
                         db: Session = Depends(get_db)):
-    validation1 = db.query(models.Users).filter(models.Users.username == username).first()
-    validation2 = db.query(models.Users).filter(models.Users.email == email).first()
-    if password != password2 or validation1 is not None or validation2 is not None:
-        msg = "Invalid registration request"
-        return templates.TemplateResponse("register.html", {"request": request, "msg": msg})
-
-    user_model = models.Users()
+    user_model = models.User()
     user_model.username = username
+    user_model.password = get_password_hash(password)
+    user_model.surname = surname
+    user_model.name = name
+    user_model.middlename = middlename
     user_model.email = email
-    user_model.first_name = firstname
-    user_model.last_name = lastname
-
-    hash_password = get_password_hash(password)
-    user_model.hashed_password = hash_password
-    user_model.is_active = True
+    user_model.department = department_id
+    user_model.telegram_id = telegram_id
 
     db.add(user_model)
     db.commit()
-
-    msg = "User successfully created"
-    return templates.TemplateResponse("login.html", {"request": request, "msg": msg})

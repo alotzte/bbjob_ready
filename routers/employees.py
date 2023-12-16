@@ -1,8 +1,8 @@
 import sys
-
+import csv
 sys.path.append("..")
 
-from fastapi import Depends, APIRouter, Request, Form
+from fastapi import Depends, APIRouter, Request, UploadFile, File
 import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
@@ -33,94 +33,44 @@ def get_db():
     finally:
         db.close()
 
-
 @router.get("/", response_class=HTMLResponse)
 async def read_all_by_user(request: Request, db: Session = Depends(get_db)):
-    user = await get_current_user(request)
+    user_data = await get_current_user(request)
+    if user_data is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    user = db.query(models.User).filter(models.User.id == user_data["id"]).first()
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-    todos = db.query(models.Todos).filter(models.Todos.owner_id == user.get('id')).order_by(models.Todos.id).all()
-    return templates.TemplateResponse("home.html", {"request": request, "todos": todos, "user": user})
+
+    employees = db.query(models.Employee).filter(models.Employee.department_id == user.department_id).all()
+
+    return templates.TemplateResponse("home.html", {"request": request, "employees": employees, "user": user})
 
 
-@router.get("/add-todo", response_class=HTMLResponse)
-async def add_new_todo(request: Request):
-    user = await get_current_user(request)
-    if user is None:
+import csv
+
+@router.post("/add-csv")  # Изменим метод на POST
+async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadFile = File(...)):
+    user_data = await get_current_user(request)
+    if user_data is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-    return templates.TemplateResponse("add-todo.html", {"request": request, "user": user})
 
+    contents = await file.read()
+    reader = csv.reader(contents.decode().splitlines())
 
-@router.post("/add-todo", response_class=HTMLResponse)
-async def add_new_todo(request: Request, title: str = Form(...), description: str = Form(...),
-                       priority: int = Form(...),
-                       db: Session = Depends(get_db)):
-    user = await get_current_user(request)
-    if user is None:
-        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-    todo_model = models.Todos()
-    todo_model.title = title
-    todo_model.description = description
-    todo_model.priority = priority
-    todo_model.complete = False
-    todo_model.owner_id = user.get('id')
+    next(reader, None)  # Пропускаем заголовок CSV, если он есть
 
-    db.add(todo_model)
-    db.commit()
-
-    return RedirectResponse(url="/todos/", status_code=status.HTTP_302_FOUND)
-
-
-@router.get("/edit-todo/{todo_id}", response_class=HTMLResponse)
-async def edit_todo(request: Request, todo_id: int, db: Session = Depends(get_db)):
-    user = await get_current_user(request)
-    if user is None:
-        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-    todo = db.query(models.Todos).filter(models.Todos.id == todo_id).first()
-
-    return templates.TemplateResponse("edit-todo.html", {"request": request, "todo": todo, "user": user})
-
-
-@router.post("/edit-todo/{todo_id}", response_class=HTMLResponse)
-async def edit_todo(request: Request, todo_id: int, title: str = Form(...), description: str = Form(...),
-                    priority: int = Form(...),
-                    db: Session = Depends(get_db)):
-    user = await get_current_user(request)
-    if user is None:
-        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-    todo = db.query(models.Todos).filter(models.Todos.id == todo_id).first()
-
-    todo.title = title
-    todo.description = description
-    todo.priority = priority
+    for row in reader:
+        new_employee = models.Employee(
+            department_id=row[0],  # Индекс столбца в CSV для department_id
+            surname=row[1],        # Индекс столбца в CSV для surname
+            name=row[2],           # Индекс столбца в CSV для name
+            middlename=row[3],     # Индекс столбца в CSV для middlename
+            email=row[4]           # Индекс столбца в CSV для email
+        )
+        db.add(new_employee)
 
     db.commit()
 
-    return RedirectResponse(url="/todos/", status_code=status.HTTP_302_FOUND)
-
-
-@router.get("/delete/{todo_id}")
-async def delete_todo(request: Request, todo_id: int, db: Session = Depends(get_db)):
-    user = await get_current_user(request)
-    if user is None:
-        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-
-    todo = db.query(models.Todos).filter(models.Todos.id == todo_id).first()
-
-    db.delete(todo)
-    db.commit()
-
-    return RedirectResponse(url="/todos/", status_code=status.HTTP_302_FOUND)
-
-
-@router.get("/complete/{todo_id}", response_class=HTMLResponse)
-async def complete_todo_by_id(request: Request, todo_id: int, db: Session = Depends(get_db)):
-    user = await get_current_user(request)
-    if user is None:
-        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-    todo = db.query(models.Todos).filter(models.Todos.id == todo_id).first()
-
-    todo.complete = not todo.complete
-    db.commit()
-
-    return RedirectResponse(url="/todos/", status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
