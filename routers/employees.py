@@ -89,14 +89,14 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
 
         features_row = [
             float(row[5]),  # Пример индекса для Age
-            str(row[6]),  # Пример индекса для BusinessTravel
-            float(row[7]),  # Пример индекса для DistanceFromHome
+            int(row[6]),  # Пример индекса для BusinessTravel
+            str(row[7]),  # Пример индекса для DistanceFromHome
             float(row[8]),  # Пример индекса для Education
-            str(row[9]),  # Пример индекса для MaritalStatus
-            float(row[10]),  # Пример индекса для MonthlyIncome
-            float(row[11]),  # Пример индекса для MonthlyRate
-            float(row[12]),  # Пример индекса для NumCompaniesWorked
-            str(row[13]),  # Пример индекса для OverTime
+            int(row[9]),  # Пример индекса для MaritalStatus
+            int(row[10]),  # Пример индекса для MonthlyIncome
+            int(row[11]),  # Пример индекса для MonthlyRate
+            int(row[12]),  # Пример индекса для NumCompaniesWorked
+            int(row[13]),  # Пример индекса для OverTime
             float(row[14]),  # Пример индекса для PercentSalaryHike
             float(row[15]),  # Пример индекса для TotalWorkingYears
             float(row[16]),  # Пример индекса для TrainingTimesLastYear
@@ -111,10 +111,7 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
             float(row[25]),  # Пример индекса для DaysBetweenReceiveRead
             float(row[26]),  # Пример индекса для RepliedMessages
             float(row[27]),  # Пример индекса для OutgoingMessageLength
-            float(row[28]),  # Пример индекса для MessagesOutsideWork
-            float(row[29]),  # Пример индекса для SentReceivedRatio
-            float(row[30]),  # Пример индекса для DataVolumeRatio
-            float(row[31]),  # Пример индекса для UnansweredQuestions
+
         ]
         features_data.append(features_row)
 
@@ -133,34 +130,31 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
         # Создаем объект Feature, связанный с этим сотрудником
         new_feature = models.Feature(
             employer_id=new_employee.id,
-            Age=row[5],  # Пример индекса для Age
-            BusinessTravel=row[6],  # Пример индекса для BusinessTravel
-            DistanceFromHome=row[7],  # Пример индекса для DistanceFromHome
-            Education=row[8],  # Пример индекса для Education
-            MaritalStatus=row[9],  # Пример индекса для MaritalStatus
-            MonthlyIncome=row[10],  # Пример индекса для MonthlyIncome
-            MonthlyRate=row[11],  # Пример индекса для MonthlyRate
-            NumCompaniesWorked=row[12],  # Пример индекса для NumCompaniesWorked
-            OverTime=row[13],  # Пример индекса для OverTime
-            PercentSalaryHike=row[14],  # Пример индекса для PercentSalaryHike
-            TotalWorkingYears=row[15],  # Пример индекса для TotalWorkingYears
-            TrainingTimesLastYear=row[16],  # Пример индекса для TrainingTimesLastYear
-            YearsAtCompany=row[17],  # Пример индекса для YearsAtCompany
-            YearsWithCurrManager=row[18],  # Пример индекса для YearsWithCurrManager
-            SentMessages=row[19],  # Пример индекса для SentMessages
-            ReceivedMessages=row[20],  # Пример индекса для ReceivedMessages
-            AddressCount=row[21],  # Пример индекса для AddressCount
-            BccCount=row[22],  # Пример индекса для BccCount
-            CcCount=row[23],  # Пример индекса для CcCount
-            HoursToRead=row[24],  # Пример индекса для HoursToRead
-            DaysBetweenReceiveRead=row[25],  # Пример индекса для DaysBetweenReceiveRead
-            RepliedMessages=row[26],  # Пример индекса для RepliedMessages
-            OutgoingMessageLength=row[27],  # Пример индекса для OutgoingMessageLength
-            MessagesOutsideWork=row[28],  # Пример индекса для MessagesOutsideWork
-            SentReceivedRatio=row[29],  # Пример индекса для SentReceivedRatio
-            DataVolumeRatio=row[30],  # Пример индекса для DataVolumeRatio
-            UnansweredQuestions=row[31],  # Пример индекса для UnansweredQuestions
-            probability=prediction(features_df)  # Пример индекса для probability
+            age=row[5],  # Пример индекса для Age
+            education=row[6],  # Пример индекса для BusinessTravel
+            marital_status=row[7],  # Пример индекса для DistanceFromHome
+            monthly_income=row[8],  # Пример индекса для Education
+            num_companies_worked=row[9],  # Пример индекса для MaritalStatus
+            over_time=row[10],  # Пример индекса для MonthlyIncome
+            total_working_years=row[11],  # Пример индекса для MonthlyRate
+            years_at_company=row[12],  # Пример индекса для NumCompaniesWorked
+            resume_on_job_search_site=row[13],  # Пример индекса для OverTime
+            company_years_ratio=row[14],  # Пример индекса для PercentSalaryHike
+            sent_messages=row[15],  # Пример индекса для TotalWorkingYears
+            received_messages=row[16],  # Пример индекса для TrainingTimesLastYear
+            message_recipients=row[17],  # Пример индекса для YearsAtCompany
+            bcc_message_count=row[18],  # Пример индекса для YearsWithCurrManager
+            cc_message_count=row[19],  # Пример индекса для SentMessages
+            late_read_messages=row[20],  # Пример индекса для ReceivedMessages
+            days_between_received_read=row[21],  # Пример индекса для AddressCount
+            replied_messages=row[22],  # Пример индекса для BccCount
+            sent_message_characters=row[23],  # Пример индекса для CcCount
+            off_hours_sent_messages=row[24],  # Пример индекса для HoursToRead
+            received_sent_ratio=row[25],  # Пример индекса для DaysBetweenReceiveRead
+            received_sent_bytes_ratio=row[26],  # Пример индекса для RepliedMessages
+            unanswered_questions=row[27],  # Пример индекса для OutgoingMessageLength
+            probability=prediction(features_df)
+
         )
         db.add(new_feature)
 
