@@ -20,9 +20,15 @@
                     <tbody>
 
                     {% for employee in employees %}
-                    <tr class="pointer employee-show-more" id="show-more-id-{{employee.id}}">
+                    <tr class="pointer employee-tr">
                         <td>{{employee.id}}</td>
                         <td>{{employee.name}}</td>
+                        <td>{{employee.percent}}</td>
+                        <td><a href="#" class="employee-show-more" id="show-more-id-{{employee.id}}">Подробнее</a></td>
+                        <td class="employee-iframe hidden" id="iframe-id-{{employee.id}}"> 
+                            <iframe src="http://46.243.227.152:3000/d-solo/f1e9df08-b241-4d63-9838-27439269f963/rabochaya?orgId=1&var-user_id={{employee.id}}&from=1702803836052&to=1702825436052&panelId=1"
+                            width="450" height="200" frameborder="0"></iframe>
+                        </td>
                     </tr>
                     {% endfor %}
 
@@ -41,13 +47,6 @@
 
         </div>
     </div>
-    {% for employee in employees %}
-    <div class="employee-iframe hidden" id="iframe-id-{{employee.id}}">
-            <iframe src="http://45.9.24.165:3000/d-solo/e7e950a4-9130-4e62-9642-f9babdc9dfbe/test?orgId=1&var-user_id={{employee.id}}&from=1702653347048&to=1702674947048&panelId=1"
-            width="450" height="200" frameborder="0"></iframe>
-    </div>
-    {% endfor %}
-
     <script>
 
     </script>
