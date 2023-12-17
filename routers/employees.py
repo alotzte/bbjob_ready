@@ -73,19 +73,26 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
     # Пропускаем заголовок файла, если он есть
     next(reader, None)
 
+
     features_data = []
 
     for row in reader:
-        # Создаем объект Employee
-        new_employee = models.Employee(
-            department_id=row[0],  # Индекс столбца в CSV для department_id
-            surname=row[1],  # Индекс столбца в CSV для surname
-            name=row[2],  # Индекс столбца в CSV для name
-            middlename=row[3],  # Индекс столбца в CSV для middlename
-            email=row[4]  # Индекс столбца в CSV для email
-        )
-        db.add(new_employee)
-        db.flush()  # Получаем ID добавленного сотрудника
+        existing_employee = db.query(models.Employee).filter_by(email=row[4]).first()
+
+        if existing_employee is None:
+            new_employee = models.Employee(
+                department_id=row[0],  # Индекс для department_id
+                surname=row[1],  # Индекс для surname
+                name=row[2],  # Индекс для name
+                middlename=row[3],  # Индекс для middlename
+                email=row[4]  # Индекс для email
+            )
+            db.add(new_employee)
+            db.flush()
+            employee_id = new_employee.id  # ID нового сотрудника
+        else:
+            # Если сотрудник существует, используем его ID
+            employee_id = existing_employee.id
 
         features_row = [
             float(row[5]),  # Пример индекса для Age
@@ -124,12 +131,12 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
        'ReceivedSentRatio', 'ReceivedSentBytesRatio', 'UnansweredQuestions'])
 
         features_data.clear()
-        print(features_df)
+
 
 
         # Создаем объект Feature, связанный с этим сотрудником
         new_feature = models.Feature(
-            employer_id=new_employee.id,
+            employer_id=employee_id,
             age=row[5],  # Пример индекса для Age
             education=row[6],  # Пример индекса для BusinessTravel
             marital_status=row[7],  # Пример индекса для DistanceFromHome
