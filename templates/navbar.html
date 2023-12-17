@@ -53,27 +53,21 @@
 </g>
 </svg></i>
         <div class="container">
-        <a class="navbar-brand" href="#">TodoApp</a>
+        <a class="navbar-brand" href="/">СБЕРеги сотрудника</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav"
                 aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                {% if user %}
-                <li class="nav-item active">
-                    <a class="nav-link" href="/">Home</a>
-                {% endif %}
-            </ul>
 
             <ul class="navbar-nav ml-auto">
                 {% if user %}
                 <li class="nav-item m-1">
-                    <a type="button" class="btn btn-outline-light" href="/users/edit-password">Edit user</a>
+                    <a type="button" class="btn btn-outline-light" href="/users/edit-password">Личный кабинет</a>
                 </li>
                 <li class="nav-item m-1">
-                    <a type="button" class="btn btn-outline-light" href="/auth/logout">Logout</a>
+                    <a type="button" class="btn btn-outline-light" href="/auth/logout">Выйти</a>
                 </li>
                 {% endif %}
             </ul>
