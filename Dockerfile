@@ -6,4 +6,4 @@ RUN pip install fastapi jinja2 uvicorn python-multipart websockets pandas SQLAlc
 
 COPY . /app/server/
 
-CMD ["uvicorn", "main:app", "--reload", "--host", "127.0.0.1"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]
