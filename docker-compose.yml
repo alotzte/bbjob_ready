@@ -1,6 +1,15 @@
 version: '3'
 
 services:
+  bbjob_serv:
+    image: bbjob_serv:0.0.1
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app/server
+    command: [ "uvicorn", "main:app", "--reload", "--host", "0.0.0.0" ]
+
   bbjob_bot:
     image: bbjob_bot:0.0.1
     build:
@@ -17,14 +26,7 @@ services:
     command: python user_notifier.py
     working_dir: /app/telegram_bot
 
-  bbjob_serv:
-    image: bbjob_serv:0.0.1
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app/server
-    command: ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]
+
 
 #  bbjob:
 #    image: bbjob:0.0.1
@@ -39,7 +41,7 @@ services:
 #    working_dir: /app/backend
 
 
-#cd /root/bbjob/app/backend && docker build -t bbjob:0.0.1 .
-#cd /root/bbjob/app/telegram_bot && docker build -t bbjob_bot:0.0.1 -f Dockerfile_bot .
-#cd /root/bbjob/app/telegram_bot && docker build -t bbjob_un:0.0.1 -f Dockerfile_user_notifier .
+#cd /root/bbjob_ready && docker build -t bbjob_serv:0.0.1 .
+#cd /root/bbjob_ready/app/telegram_bot && docker build -t bbjob_bot:0.0.1 -f Dockerfile_bot .
+#cd /root/bbjob_ready/app/telegram_bot && docker build -t bbjob_un:0.0.1 -f Dockerfile_user_notifier .
 
