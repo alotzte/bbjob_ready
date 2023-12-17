@@ -9,6 +9,10 @@ h1, h2, h3, h4, h5, h6 {
   color: #323232;
 }
 
+label{
+    margin: 0;
+}
+
 .main-color {
   background-color: #0e76a8 ;
 }
@@ -17,6 +21,46 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: line-through;
 }
 
+.navbar-brand{
+    position: relative;
+}
 
 
+.add-file-form {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
 
+.add-file-form__submit, .btn_blue{
+    padding: 10px 10px;
+    background: transparent;
+    color: #0e76a8;
+    border: 1px solid #0e76a8;
+    border-radius: 10px;
+    transition: all 0.3s ease-out;
+}
+
+.btn_blue:hover{
+    background:#0e76a8;
+    color: #fff;
+}
+
+.add-file-form__file {
+    display: none;
+}
+
+.done{
+    background: url(/static/img/ok.svg);
+    background-repeat: no-repeat ;
+    background-position: center;
+    background-size: contain;
+}
+.file-label{
+    width:126px;
+    height: 46px;
+}
+.hidden{
+    display: none;
+}
