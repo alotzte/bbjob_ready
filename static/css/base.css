@@ -64,3 +64,36 @@ label{
 .hidden{
     display: none;
 }
+
+.employee-tr{
+    position: relative;
+}
+.employee-iframe{
+    position: absolute;
+    top: 0 ;
+    left: 100px;
+}
+
+.employee-show-more{
+    cursor: pointer;
+    padding: 0 20px 0 0;
+    position: relative;
+}
+
+.employee-show-more::after{
+    content: '';
+    position: absolute;
+    top: 0 ;
+    right: 0;
+    cursor: pointer;
+    padding: 0 20px 0 0;
+    background-image: url(/static/img/arrow.svg);
+    background-repeat: no-repeat ;
+    background-position: right;
+    background-size: 16px;
+    transition: all 0.3s ease-out;
+}
+
+.employee-show-more::after .opened{
+    transform: rotate(180deg);
+}

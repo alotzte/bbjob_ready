@@ -1,9 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
-
 
 class User(Base):
     __tablename__ = 'users'
@@ -15,14 +14,12 @@ class User(Base):
     middlename = Column(String(100))
     email = Column(String(100))
     department_id = Column(Integer, ForeignKey('departments.id'))
-    telegram_id = Column(Integer, nullable=True)
+    telegram_id = Column(Integer)
 
 class Department(Base):
     __tablename__ = 'departments'
     id = Column(Integer, primary_key=True)
     title = Column(String(255))
-    users = relationship('User', backref='department_ref')
-    employees = relationship('Employee', backref='department_ref')
 
 class Employee(Base):
     __tablename__ = 'employees'
@@ -32,38 +29,37 @@ class Employee(Base):
     name = Column(String(100))
     middlename = Column(String(100))
     email = Column(String(100))
-    features = relationship('Feature', backref='employee_ref')
 
 class Feature(Base):
     __tablename__ = 'features'
     id = Column(Integer, primary_key=True)
     employer_id = Column(Integer, ForeignKey('employees.id'))
-    Age = Column(Float)
-    BusinessTravel = Column(String)
-    DistanceFromHome = Column(Float)
-    Education = Column(String)
-    MaritalStatus = Column(String)
-    MonthlyIncome = Column(Float)
-    MonthlyRate = Column(Float)
-    NumCompaniesWorked = Column(Float)
-    OverTime = Column(String)
-    PercentSalaryHike = Column(Float)
-    TotalWorkingYears = Column(Float)
-    TrainingTimesLastYear = Column(Float)
-    YearsAtCompany = Column(Float)
-    YearsWithCurrManager = Column(Float)
-    SentMessages = Column(Float)
-    ReceivedMessages = Column(Float)
-    AddressCount = Column(Float)
-    BccCount = Column(Float)
-    CcCount = Column(Float)
-    HoursToRead = Column(Float)
-    DaysBetweenReceiveRead = Column(Float)
-    RepliedMessages = Column(Float)
-    OutgoingMessageLength = Column(Float)
-    MessagesOutsideWork = Column(Float)
-    SentReceivedRatio = Column(Float)
-    DataVolumeRatio = Column(Float)
-    UnansweredQuestions = Column(Float)
+    age = Column(Integer)
+    education = Column(Integer, ForeignKey('education.id'))
+    marital_status = Column(String)
+    monthly_income = Column(Float)
+    num_companies_worked = Column(Integer)
+    over_time = Column(Integer)
+    total_working_years = Column(Integer)
+    years_at_company = Column(Integer)
+    resume_on_job_search_site = Column(Integer)
+    company_years_ratio = Column(Float)
+    sent_messages = Column(Float)
+    received_messages = Column(Float)
+    message_recipients = Column(Float)
+    bcc_message_count = Column(Float)
+    cc_message_count = Column(Float)
+    late_read_messages = Column(Float)
+    days_between_received_read = Column(Float)
+    replied_messages = Column(Float)
+    sent_message_characters = Column(Float)
+    off_hours_sent_messages = Column(Float)
+    received_sent_ratio = Column(Float)
+    received_sent_bytes_ratio = Column(Float)
+    unanswered_questions = Column(Float)
     probability = Column(Float)
 
+class Education(Base):
+    __tablename__ = 'education'
+    id = Column(Integer, primary_key=True)
+    education_name = Column(String(100))
