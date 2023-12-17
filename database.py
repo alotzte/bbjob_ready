@@ -5,7 +5,7 @@ import models
 from models import Department, Education
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://root:BB123123!@45.9.25.238:5432/postgres"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123@localhost:5432/employees"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL

@@ -5,6 +5,7 @@ sys.path.append("..")
 import csv
 
 import pandas as pd
+from sqlalchemy.orm import joinedload
 
 from fastapi import Depends, APIRouter, Request, UploadFile, File
 import models
@@ -56,9 +57,17 @@ async def read_all_by_user(request: Request, db: Session = Depends(get_db)):
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    employees = db.query(models.Employee).filter(models.Employee.department_id == user.department_id).all()
+    # Получение сотрудников и их свойств
+    employees_with_features = db.query(models.Employee).options(joinedload(models.Employee.features))\
+                                .filter(models.Employee.department_id == user.department_id).all()
 
-    return templates.TemplateResponse("home.html", {"request": request, "employees": employees, "user": user})
+    # Выбор и округление последней вероятности увольнения для каждого сотрудника
+    for employee in employees_with_features:
+        last_feature = max(employee.features, key=lambda x: x.id) if employee.features else None
+        employee.latest_probability = int(round(last_feature.probability, 2)*100) if last_feature else None
+    # Сортировка сотрудников по вероятности увольнения от большего к меньшему
+    sorted_employees = sorted(employees_with_features, key=lambda x: x.latest_probability or 0, reverse=True)
+    return templates.TemplateResponse("home.html", {"request": request, "employees": sorted_employees, "user": user})
 
 
 @router.post("/add-csv")
@@ -72,7 +81,6 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
 
     # Пропускаем заголовок файла, если он есть
     next(reader, None)
-
 
     features_data = []
 
@@ -123,16 +131,18 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
         features_data.append(features_row)
 
         features_df = pd.DataFrame(features_data, columns=['age', 'Education', 'MaritalStatus', 'MonthlyIncome',
-       'NumCompaniesWorked', 'OverTime', 'TotalWorkingYears', 'YearsAtCompany',
-       'ResumeOnJobSearchSite', 'CompanyYearsRatio', 'SentMessages',
-       'ReceivedMessages', 'MessageRecipients', 'BccMessageCount',
-       'CcMessageCount', 'LateReadMessages', 'DaysBetweenReceivedRead',
-       'RepliedMessages', 'SentMessageCharacters', 'OffHoursSentMessages',
-       'ReceivedSentRatio', 'ReceivedSentBytesRatio', 'UnansweredQuestions'])
+                                                           'NumCompaniesWorked', 'OverTime', 'TotalWorkingYears',
+                                                           'YearsAtCompany',
+                                                           'ResumeOnJobSearchSite', 'CompanyYearsRatio', 'SentMessages',
+                                                           'ReceivedMessages', 'MessageRecipients', 'BccMessageCount',
+                                                           'CcMessageCount', 'LateReadMessages',
+                                                           'DaysBetweenReceivedRead',
+                                                           'RepliedMessages', 'SentMessageCharacters',
+                                                           'OffHoursSentMessages',
+                                                           'ReceivedSentRatio', 'ReceivedSentBytesRatio',
+                                                           'UnansweredQuestions'])
 
         features_data.clear()
-
-
 
         # Создаем объект Feature, связанный с этим сотрудником
         new_feature = models.Feature(
@@ -175,7 +185,6 @@ async def export_csv(db: Session = Depends(get_db)):
     # Получаем данные из базы данных с учетом связанных объектов Feature
     result = db.execute(select(models.Employee).options(joinedload(models.Employee.features)))
     employees = result.unique().scalars().all()
-
 
     # Подготовка CSV файла
     output = StringIO()

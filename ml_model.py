@@ -21,5 +21,6 @@ def prediction(dataframe):
     data = data.merge(X,'right')
     predictions = loaded_model.predict_proba(data)
 
+
     return predictions[0][1]
 
