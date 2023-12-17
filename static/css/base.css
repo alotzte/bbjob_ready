@@ -71,7 +71,7 @@ label{
 .employee-iframe{
     position: absolute;
     top: 0 ;
-    left: 100px;
+    left: 3500px;
 }
 
 .employee-show-more{
@@ -85,8 +85,9 @@ label{
     position: absolute;
     top: 0 ;
     right: 0;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
-    padding: 0 20px 0 0;
     background-image: url(/static/img/arrow.svg);
     background-repeat: no-repeat ;
     background-position: right;
@@ -94,6 +95,6 @@ label{
     transition: all 0.3s ease-out;
 }
 
-.employee-show-more::after .opened{
+.employee-show-more::after.opened{
     transform: rotate(180deg);
 }

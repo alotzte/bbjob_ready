@@ -35,8 +35,6 @@ class LoginForm:
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# models.Base.metadata.create_all(bind=engine)
-
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter(

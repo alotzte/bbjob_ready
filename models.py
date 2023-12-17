@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -16,10 +17,12 @@ class User(Base):
     department_id = Column(Integer, ForeignKey('departments.id'))
     telegram_id = Column(Integer)
 
+
 class Department(Base):
     __tablename__ = 'departments'
     id = Column(Integer, primary_key=True)
     title = Column(String(255))
+
 
 class Employee(Base):
     __tablename__ = 'employees'
@@ -29,6 +32,8 @@ class Employee(Base):
     name = Column(String(100))
     middlename = Column(String(100))
     email = Column(String(100))
+    features = relationship("Feature", backref="employee")
+
 
 class Feature(Base):
     __tablename__ = 'features'
@@ -58,6 +63,7 @@ class Feature(Base):
     received_sent_bytes_ratio = Column(Float)
     unanswered_questions = Column(Float)
     probability = Column(Float)
+
 
 class Education(Base):
     __tablename__ = 'education'

@@ -9,7 +9,7 @@ import pandas as pd
 from fastapi import Depends, APIRouter, Request, UploadFile, File
 import models
 from database import engine, SessionLocal
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from .auth import get_current_user
 
@@ -172,18 +172,49 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
 
 @router.get("/export-csv")
 async def export_csv(db: Session = Depends(get_db)):
-    # Получаем данные из базы данных
-    result = db.execute(select(models.Employee))
-    employees = result.scalars().all()
+    # Получаем данные из базы данных с учетом связанных объектов Feature
+    result = db.execute(select(models.Employee).options(joinedload(models.Employee.features)))
+    employees = result.unique().scalars().all()
+
 
     # Подготовка CSV файла
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(['department_id', 'surname', 'name', 'middlename', 'email'])  # Заголовки столбцов
 
-    # Запись данных сотрудников в CSV
+    # Заголовки столбцов
+    writer.writerow([
+        'department_id', 'surname', 'name', 'middlename', 'email',
+        'age', 'education', 'marital_status', 'monthly_income', 'num_companies_worked',
+        'over_time', 'total_working_years', 'years_at_company', 'resume_on_job_search_site',
+        'company_years_ratio', 'sent_messages', 'received_messages', 'message_recipients',
+        'bcc_message_count', 'cc_message_count', 'late_read_messages',
+        'days_between_received_read', 'replied_messages', 'sent_message_characters',
+        'off_hours_sent_messages', 'received_sent_ratio', 'received_sent_bytes_ratio',
+        'unanswered_questions', 'probability'
+    ])
+
+    # Запись данных сотрудников и их характеристик в CSV
     for employee in employees:
-        writer.writerow([employee.department_id, employee.surname, employee.name, employee.middlename, employee.email])
+        # Собираем данные о сотруднике
+        employee_data = [employee.department_id, employee.surname, employee.name, employee.middlename, employee.email]
+
+        # Для каждой записи характеристик сотрудника создаем отдельную строку в CSV
+        if employee.features:
+            for feature in employee.features:
+                features_data = [
+                    feature.age, feature.education, feature.marital_status, feature.monthly_income,
+                    feature.num_companies_worked, feature.over_time, feature.total_working_years,
+                    feature.years_at_company, feature.resume_on_job_search_site, feature.company_years_ratio,
+                    feature.sent_messages, feature.received_messages, feature.message_recipients,
+                    feature.bcc_message_count, feature.cc_message_count, feature.late_read_messages,
+                    feature.days_between_received_read, feature.replied_messages, feature.sent_message_characters,
+                    feature.off_hours_sent_messages, feature.received_sent_ratio, feature.received_sent_bytes_ratio,
+                    feature.unanswered_questions, feature.probability
+                ]
+                writer.writerow(employee_data + features_data)
+        else:
+            # Если у сотрудника нет характеристик, создаем строку только с данными сотрудника
+            writer.writerow(employee_data)
 
     output.seek(0)
 

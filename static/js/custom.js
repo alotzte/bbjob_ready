@@ -11,5 +11,6 @@ $( document ).ready(function() {
         let id = $(this).attr('id');
         let showId = 'iframe-id-' + id.substr(13);
         $('#' + showId).toggleClass('hidden');
+        $('.employee-show-more').toggleClass('opened');
     });
 });
