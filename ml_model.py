@@ -2,7 +2,7 @@ from catboost import CatBoostClassifier
 import pandas as pd
 
 loaded_model = CatBoostClassifier()
-loaded_model.load_model('fire_prediction_2.cbm')
+loaded_model.load_model('fire_prediction_final_1.cbm')
 
 
 def prediction(dataframe):

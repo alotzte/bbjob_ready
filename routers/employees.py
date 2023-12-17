@@ -118,17 +118,17 @@ async def add_csv(request: Request, db: Session = Depends(get_db), file: UploadF
         ]
         features_data.append(features_row)
 
-        features_df = pd.DataFrame(features_data, columns=[
-            'Age',
-            'BusinessTravel', 'DistanceFromHome', 'Education',
-            'MaritalStatus', 'MonthlyIncome', 'MonthlyRate', 'NumCompaniesWorked',
-            'OverTime', 'PercentSalaryHike', 'TotalWorkingYears',
-            'TrainingTimesLastYear', 'YearsAtCompany', 'YearsWithCurrManager',
-            'SentMessages', 'ReceivedMessages', 'AddressCount', 'BccCount',
-            'CcCount', 'HoursToRead', 'DaysBetweenReceiveRead', 'RepliedMessages',
-            'OutgoingMessageLength', 'MessagesOutsideWork', 'SentReceivedRatio',
-            'DataVolumeRatio', 'UnansweredQuestions'
-        ])
+        features_df = pd.DataFrame(features_data, columns=['age', 'Education', 'MaritalStatus', 'MonthlyIncome',
+       'NumCompaniesWorked', 'OverTime', 'TotalWorkingYears', 'YearsAtCompany',
+       'ResumeOnJobSearchSite', 'CompanyYearsRatio', 'SentMessages',
+       'ReceivedMessages', 'MessageRecipients', 'BccMessageCount',
+       'CcMessageCount', 'LateReadMessages', 'DaysBetweenReceivedRead',
+       'RepliedMessages', 'SentMessageCharacters', 'OffHoursSentMessages',
+       'ReceivedSentRatio', 'ReceivedSentBytesRatio', 'UnansweredQuestions'])
+
+        features_data.clear()
+        print(features_df)
+
 
         # Создаем объект Feature, связанный с этим сотрудником
         new_feature = models.Feature(
